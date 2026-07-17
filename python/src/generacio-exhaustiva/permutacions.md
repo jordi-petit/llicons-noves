@@ -4,7 +4,6 @@
 
 Aquesta lliçó presenta algorismes de generació exhaustiva per tal de generar permutacions de determinats conjunts. Per a fer-ho, es presenten diferents exemples de complexitat creixent, alhora que es milloren els algorismes. La recursivitat és la tècnica fonamental d'aquest tipus d'algorismes combinatoris.
 
-
 ## Permutacions
 
 Comencem amb un programa que escrigui (en ordre lexicogràfic) totes les permutacions de $\\{1,...,n\\}$ per a una $n\ge0$ donada. Per exemple, per a $n = 3$, caldria escriure
@@ -57,15 +56,14 @@ def generar_permutacions_rec(n: int, L: list[int]) -> None:
     """Escriu totes les permutacions de {1..n} que comencin amb L, per a n ≥ |L| ≥ 0."""
 
     if len(L) == n:
-        escriure(n)
+        escriure(L)
     else:
-        for x in range(1, n+1):
-            if x not L:
+        for x in range(1, n + 1):
+            if x not in L:
                 generar_permutacions_rec(n , L + [x])
 ```
 
 El cas base es dóna quan `L` ja és de llargada `n`, i llavors només cal escriure `L` en el format prescrit. El cas recursiu, quan `len(L) < n`, consisteix en afegir un element `x` al final de `L`. Aquest `x` pot ser qualsevol element en entre 1 i `n` que encara no s'hagi posat en `L` (perquè, en una permutació, no poden haver-hi repetits).
-
 
 ## Una millora d'eficiència
 
@@ -99,7 +97,7 @@ def generar_permutacions(n: int) -> None:
 
     L = [0 for _ in range(n)]  # els valors no són importants, la llargada sí
     usats = [False for _ in range(n + 1)]  # la posició 0 no s'utilitza
-    generar_permutacions_rec(0, L, 0, usats)
+    generar_permutacions_rec(n, L, 0, usats)
 ```
 
 I la funció recursiva es pot implementar així:
@@ -144,6 +142,5 @@ L'arbre de crides i el valor actual de `L` en el cas $n=3$ és el següent:
     └── [3,2,·]
         └── [3,2,1]
 </pre>
-
 
 <Autors autors="jpetit"/>
