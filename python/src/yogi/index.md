@@ -12,8 +12,7 @@ Aquesta lliçó explica com instal·lar i utilitzar el mòdul `yogi`.
 
 ## Instal·lació
 
--   Instal·leu amb `pip install yogi` o amb `pip3 install yogi`
-    (segons el vostre sistema).
+-   Instal·leu amb `python3 -m pip install yogi`.
 
 ## Ús bàsic
 

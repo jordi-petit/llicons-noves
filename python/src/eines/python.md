@@ -47,7 +47,7 @@ TODO: posar enllaç a curs terminal
 Ara convé que afegiu uns paquets addicionals que utilitzarem durant el curs: Es tracta de `yogi` (un paquet per simplificar la lectura de dades), `numpy` (un paquet per treballar amb vectors) i `mypy` (una eina per trobar errors als programes). Per a fer-ho, executeu
 
 ```sh
-pip install yogi numpy pypy
+python3 -m pip install yogi numpy pypy
 ```
 
 Enlloc de `pip`, potser heu d'utilitzar `pip3` o `pip3.11` (habitualment el patró coïncideix amb el de la comanda `python`).

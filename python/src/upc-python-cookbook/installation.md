@@ -100,14 +100,9 @@ We can install some useful packages with `pip3` or `pip` command. These are some
 You can install all of them by following the command using [terminal](#checking-the-version)
 
 ```bash
-pip3 install numpy scipy sympy matplotlib jupyter scikit-image easyinput
+python3 -m pip install numpy scipy sympy matplotlib jupyter scikit-image easyinput
 ```
 
-or
-
-```bash
-pip install numpy scipy sympy matplotlib jupyter scikit-image easyinput
-```
 
 ## Installing Jupyter Notebook
 

@@ -4,7 +4,6 @@
 
 This lesson presents a program to read a poem and obtain some statistics about the length of its words.
 
-
 ## Statement and example
 
 Given a poem, suppose we are interested in knowing which is the longest word, how many words it contains, and what is the average length (in number of letters).
@@ -19,13 +18,12 @@ the second goes behind and then comes the third
 we should get as output
 
 ```text
-number of words: 21
-average length: 3.7619
-longest word: first
+number of words: 20
+average length: 4.0
+longest word: second
 ```
 
 If there are several words with the same maximum number of letters, any one of them can be printed.
-
 
 ## Solution
 
@@ -50,7 +48,6 @@ After the loop, we just need to report the calculated values.
 
 The complete program is as follows:
 
-
 ```python
 from yogi import tokens
 
@@ -60,7 +57,7 @@ def main():
     sum_lengths = 0
     longest_word = ''
     # main loop for each word in the input
-    for word in tokens():
+    for word in tokens(str):
         number_words = number_words + 1
         sum_lengths = sum_lengths + len(word)
         if len(word) > len(longest_word):
@@ -76,7 +73,5 @@ if __name__ == '__main__':
 ```
 
 It should be noted that this program only works correctly if the poem has at least one word, because otherwise the average length would not be well defined.
-
-
 
 <Authors authors="jpetit roura"/>
