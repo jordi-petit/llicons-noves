@@ -2,7 +2,7 @@
 
 Dissenyar un bucle vol dir decidir com s'inicialitzen les variables, quina condició el fa continuar, què fa el cos a cada volta i com es pot saber que acabarà. Un **invariant** és la propietat que lliga aquestes quatre decisions.
 
-Aquesta lliçó presenta el raonament amb invariants, una manera sistemàtica de dissenyar bucles i de convèncer-se que fan el que han de fer. L'apliquem a quatre exemples: el factorial, capgirar els dígits d'un nombre, classificar els elements d'una llista i fusionar dues llistes ordenades.
+Aquesta lliçó presenta el raonament amb invariants, una manera sistemàtica de dissenyar bucles i de convèncer-se que fan el que han de fer. L'apliquem a tres exemples: el factorial, capgirar els dígits d'un nombre i classificar els elements d'una llista.
 
 ## Què és un invariant
 
@@ -12,7 +12,7 @@ Un invariant d'un bucle és una proposició sobre les variables del programa que
 - al començament de cada iteració,
 - al final de cada iteració.
 
-Cada vegada que l'execució és a punt de comprovar la condició del `while`, l'invariant és cert. Dins del cos pot deixar de ser-ho un moment, però el cos l'ha de tornar a deixar establert abans de tornar a la condició.
+Cada vegada que l'execució és a punt de comprovar la condició del `while`, l'invariant és cert. Dins del cos del bucle pot deixar de ser-ho un moment, però el cos del bucle l'ha de tornar a deixar establert abans de tornar a la condició.
 
 L'invariant serveix per a quatre coses:
 
@@ -25,17 +25,19 @@ Triar-ne un de bo no sempre és fàcil, i és la part important del disseny. Con
 
 ## Esquema general d'un bucle
 
-El patró de qualsevol bucle raonat amb un invariant és aquest:
+El patró d'un bucle raonat amb un invariant és aquest:
 
 ```python
-# inicialització
+Inicialització()
 # Invariant
 while condició:
-    # Invariant i condició
-    # cos del bucle
+    # Invariant ∧ condició
+    CosDelBucle()
     # Invariant
-# Invariant i no condició
+# Invariant ∧ ¬condició
 ```
+
+(Recordeu que $P \land Q$ és la conjunció de $P$ i de $Q$, i $¬P$ és la negació de $P$.)
 
 Hi ha quatre obligacions:
 
@@ -48,6 +50,8 @@ Una manera pràctica de trobar l'invariant és aturar mentalment el programa al 
 
 <img src='./foto.png' alt='n és el prefix blau encara per tractar, r és el revés del sufix vermell, i la juxtaposició dels dos trossos de dalt és m.' style='width: 34em; max-width: 100%; display: block; margin: 1.2em auto;'/>
 
+Fixeu-vos que l'invariant descriu una _propietat estàtica i atemporal_ del bucle: l'invariant captura la relació entre les variables en un instant donat (en tres punts determinats). Un error freqüent és confondre l'invariant amb alguna _propietat dinàmica o temporal_ del bucle. En un invariant consideracions del tipus _abans_, _després_, _fins que_, _mentre_, _valor anterior_,... són errònies. Penseu en l'invariant com a un fotograma, no la pel·licúla resultant de passar els fotogramas successius més o menys ràpid.
+
 ## El factorial
 
 Donat un enter $n \ge 0$, volem calcular $n!$. El factorial es defineix així:
@@ -56,7 +60,19 @@ $$
 n! = 1 \cdot 2 \cdot 3 \cdot \ldots \cdot n,
 $$
 
-amb el cas particular $0! = 1$.
+Recordeu que $0! = 1$ per la definició.
+
+Volem omplir les quatre obligacions de l'esquema general. Comencem per l'esquema:
+
+```python
+...
+# Invariant
+while condició:
+    # Invariant ∧ condició
+    ...
+    # Invariant
+# Invariant ∧ ¬condició
+```
 
 Triem aquest invariant: a cada iteració mantindrem
 
@@ -64,15 +80,59 @@ $$
 f = i! \quad\text{i}\quad i \le n.
 $$
 
-La inicialització en surt de seguida. Volem $f = i!$ amb $i \le n$, i sabem que $0! = 1$. La precondició (allò que podem suposar de l'entrada) diu que $n \ge 0$, així que podem posar `i = 0` i `f = 1`.
-
-La condició del bucle surt de la postcondició. En acabar volem $f = n!$. Si l'invariant ens dóna $f = i!$ i $i \le n$, n'hi ha prou que en sortir es compleixi $i = n$. Per tant la condició del `while` és `i != n`: mentre sigui certa encara no hem acabat, i quan deixa de ser-ho l'invariant obliga $i = n$ i, amb ell, $f = n!$.
-
-El cos ha de restaurar l'invariant. Si fem `i = i + 1`, el nou valor d'`i` és una unitat més gran i el factorial que li correspon és l'antic multiplicat per aquest `i` nou. Cal, doncs, incrementar primer i multiplicar després:
+La inicialització en surt de seguida: Volem $f = i!$ amb $i \le n$, i sabem que $0! = 1$. La precondició (allò que podem suposar de l'entrada) diu que $n \ge 0$, així que podem posar `i = 0` i `f = 1`. Per tant, ara tenim aquest fragment:
 
 ```python
-i = i + 1
-f = f * i
+i = 0
+f = 1
+# f = i! ∧ i ≤ n
+while condició:
+    # f = i! ∧ i ≤ n ∧ condició
+    ...
+    # f = i! ∧ i ≤ n
+# f = i! ∧ i ≤ n ∧ ¬condició
+```
+
+La condició del bucle surt de la postcondició: En acabar volem $f = n!$. Si l'invariant ens dóna $f = i!$ i $i \le n$, n'hi ha prou que en sortir es compleixi $i = n$. Per tant la condició del `while` és `i != n`: mentre sigui certa encara no hem acabat, i quan deixa de ser-ho l'invariant obliga $i = n$ i, amb ell, $f = n!$. Per tant, ara tenim aquest fragment:
+
+```python
+i = 0
+f = 1
+# f = i! ∧ i ≤ n
+while i != n:
+    # f = i! ∧ i ≤ n ∧ i != n   ⟺    f = i! ∧ i < n
+    ...
+    # f = i! ∧ i ≤ n
+# f = i! ∧ i ≤ n ∧ i = n   ⟺    f = n!
+```
+
+Com que al final del programa tenim $f = n!$, és clar que cal retornar $f$. Per tant, ara tenim aquest fragment:
+
+```python
+i = 0
+f = 1
+# f = i! ∧ i ≤ n
+while i != n:
+    # f = i! ∧ i ≤ n ∧ i != n   ⟺    f = i! ∧ i < n
+    ...
+    # f = i! ∧ i ≤ n
+# f = i! ∧ i ≤ n ∧ i = n   ⟺    f = n!
+return f
+```
+
+El cos ha de restaurar l'invariant. Si fem `i = i + 1`, el nou valor d'`i` és una unitat més gran i el factorial que li correspon és l'antic multiplicat per aquest `i` nou. Cal, doncs, incrementar primer i multiplicar després. Per tant, ara tenim aquest fragment:
+
+```python
+i = 0
+f = 1
+# f = i! ∧ i ≤ n
+while i != n:
+    # f = i! ∧ i ≤ n ∧ i != n   ⟺    f = i! ∧ i < n
+    i = i + 1
+    f = f * i
+    # f = i! ∧ i ≤ n
+# f = i! ∧ i ≤ n ∧ i = n   ⟺    f = n!
+return f
 ```
 
 El bucle acaba perquè `i` comença a 0, creix d'un en un i la precondició assegura $n \ge 0$: `i` no pot avançar per sempre sense arribar a `n`.
@@ -85,19 +145,21 @@ def factorial(n: int) -> int:
 
     i = 0
     f = 1
-    # Invariant: f = i! i i ≤ n
+    # f = i! ∧ i ≤ n
     while i != n:
-        # f = i! i i < n
+        # f = i! ∧ i ≤ n ∧ i != n   ⟺    f = i! ∧ i < n
         i = i + 1
         f = f * i
-        # f = i! i i ≤ n
-    # f = i! i i = n, per tant f = n!
+        # f = i! ∧ i ≤ n
+    # f = i! ∧ i ≤ n ∧ i = n   ⟺    f = n!
     return f
 ```
 
+Com heu vist, hem utilitzant l'invariant per guiar tota l'escriptura de la funció. Evidentment, trobar un invariant bo no és fàcil i requereix ingeni i molta pràctica, però igualement també calia ingeni i molta pràctica per escriure programes correctes! A més, l'invariant proporciona una documentació implícita que explica la raó del funcionament del programa: el que fa el bucle és mantenir l'invariant. L'invariant elimina el component intuitiu del disseny o l'anàlisi de programes iteratius.
+
 ## Capgirar els dígits
 
-Volem una funció que, donat un enter $m \ge 0$, en retorni un altre amb els mateixos dígits en base 10 escrits del revés.
+Volem una funció que, donat un enter $m \ge 0$, en retorni un altre amb els mateixos dígits en base 10 escrits del revés. Aquests són alguns exemples:
 
 |   `m` | resultat |
 | ----: | -------: |
@@ -107,13 +169,11 @@ Volem una funció que, donat un enter $m \ge 0$, en retorni un altre amb els mat
 |     0 |        0 |
 |   100 |        1 |
 
-La idea és anar traient l'últim dígit del que queda del nombre i afegir-lo al final del resultat. Per descriure on som a mitja feina fan falta dues variables: `n`, amb els dígits que encara no hem tractat, i `r`, amb els dígits ja extrets, escrits del revés.
-
-L'invariant és gràfic:
+L'invariant el representa gràficament com a segueix:
 
 <img src='./capgira-digits.png' alt='n és el prefix blau encara per tractar, r és el revés del sufix vermell, i la juxtaposició dels dos trossos de dalt és m.' style='width: 34em; max-width: 100%; display: block; margin: 1.2em auto;'/>
 
-Els dígits de `m` són els dígits de `n` (el tros blau) seguits dels dígits ja extrets. Aquests dígits extrets es dibuixen en vermell en l'ordre original, `xyz`, just darrere de `n`, de manera que els dos trossos de dalt reconstrueixen `m`. La variable `r` no els guarda en aquest ordre: en guarda el revés, `zyx`. El tros vermell de dalt no és una variable; només fa visible la relació entre `m`, `n` i `r`.
+Els dígits de `m` són alguns dels dígits en blau a la part esquerra de la figura seguits dels dígits en vermell a la part dreta. Aquests dígits extrets es dibuixen en vermell en l'ordre original, `xyz`, just darrere de `n`, de manera que els dos trossos de dalt reconstrueixen `m`. La variable `r` no els guarda en aquest ordre: en guarda el revés, `zyx`. El tros vermell de dalt no és una variable; només fa visible la relació entre `m`, `n` i `r`.
 
 Quan `n` val 0 ja no queda cap dígit per extreure, així que `r` és `m` escrit del revés. La condició del bucle és, per tant, `n != 0`.
 
@@ -190,62 +250,6 @@ def classifica(L: list[int], x: int, y: int) -> None:
 ```
 
 Sobre l'exemple anterior, aquesta funció deixa exactament `[1, 3, 0, 7, 9, 6, 11, 10, 13, 15]`.
-
-## Fusió de dues llistes ordenades
-
-Volem una funció que rebi dues llistes ordenades de manera creixent i en retorni la fusió, també ordenada. Per exemple, la fusió de
-
-```text
-A = [-9, -7, 0, 1, 3, 4]
-B = [-8, -7, 1, 2, 2, 4, 5]
-```
-
-és
-
-```text
-C = [-9, -8, -7, -7, 0, 1, 1, 2, 2, 3, 4, 4, 5]
-```
-
-Com que `A` i `B` ja estan ordenades, la fusió es pot fer en una sola passada, amb dos índexs `i` i `j` sobre les dues llistes.
-
-Aquest és un instant intermedi de l'algorisme. Els elements blaus ja s'han consumit; els vermells encara no:
-
-<img src='./fusio-invariant.png' alt='A té i al límit entre els elements ja fusionats i els pendents, B té j al mateix límit, i C conté la fusió del prefix blau.' style='width: 36em; max-width: 100%; display: block; margin: 1.2em auto;'/>
-
-L'invariant té dues parts:
-
-- `C` és la fusió ordenada de `A[0:i]` i `B[0:j]`,
-- tots els elements blaus són més petits o iguals que tots els vermells.
-
-A la figura, `i` val 2 i `j` val 1: la fusió de `[-9, -7]` i `[-8]` és justament `[-9, -8, -7]`. El blau més gran és $-7$ i el vermell més petit també és $-7$, de manera que cap element pendent pot haver d'anar davant del que ja hi ha a `C`.
-
-Per això el següent element de `C` és el més petit entre `A[i]` i `B[j]`. S'afegeix a `C` i s'avança l'índex corresponent. L'invariant es manté, perquè les dues llistes estan ordenades: tot el que queda en una llista és més gran o igual que el seu primer element pendent, i aquest era més gran o igual que tot el que ja hem posat a `C`.
-
-El bucle continua mentre `i` i `j` apuntin tots dos a un element. Quan un dels dos arriba al final, el tros que queda de l'altra llista ja està ordenat i és més gran o igual que tot `C`, i es pot afegir d'un cop. Cada volta avança `i` o `j`, així que una de les dues llistes s'acaba.
-
-```python
-def fusio(A: list[int], B: list[int]) -> list[int]:
-    """Retorna la fusió ordenada d'A i de B.
-    Precondició: A i B estan ordenades de manera creixent.
-    """
-
-    C: list[int] = []
-    i, j = 0, 0
-    # Invariant: C és la fusió de A[0:i] i B[0:j],
-    # i els elements ja consumits són ≤ que els pendents
-    while i < len(A) and j < len(B):
-        if A[i] <= B[j]:
-            C.append(A[i])
-            i = i + 1
-        else:
-            C.append(B[j])
-            j = j + 1
-    C.extend(A[i:])
-    C.extend(B[j:])
-    return C
-```
-
-Al començament `i` i `j` valen 0 i `C` és buida: la fusió de dos prefixos buits és la llista buida, i encara no hi ha cap element blau. En sortir del bucle, un dels dos trossos `A[i:]` o `B[j:]` és buit, de manera que les dues crides a `extend` només afegeixen el que realment queda.
 
 ## Com trobar un bon invariant
 
