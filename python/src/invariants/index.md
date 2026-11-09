@@ -159,15 +159,15 @@ Com heu vist, hem utilitzant l'invariant per guiar tota l'escriptura de la funci
 
 ## Capgirar els dígits
 
-Volem una funció que, donat un enter $m \ge 0$, en retorni un altre amb els mateixos dígits en base 10 escrits del revés. Aquests són alguns exemples:
+Volem una funció que, donat un enter $m \ge 0$, en retorni un altre $r$ amb els mateixos dígits en base 10 escrits del revés. Aquests són alguns exemples:
 
-|   `m` | resultat |
-| ----: | -------: |
-| 35276 |    67253 |
-|    19 |       91 |
-|     3 |        3 |
-|     0 |        0 |
-|   100 |        1 |
+|   `m` |   `r` |
+| ----: | ----: |
+| 35276 | 67253 |
+|    19 |    91 |
+|     3 |     3 |
+|     0 |     0 |
+|   100 |     1 |
 
 L'invariant el representa gràficament com a segueix:
 
@@ -200,11 +200,15 @@ def capgira_digits(m: int) -> int:
     return r
 ```
 
+Com veieu, un invariant gràfic com el donar ajuda a dissenyar i comprendre el bucle.
+
 ## Classificar els elements d'una llista
 
-Tenim una llista `L` i un interval `[x, y]`, amb $x \le y$. Volem reordenar `L` de manera que els elements menors que `x` quedin a la part esquerra, els majors que `y` a la part dreta, i els de l'interval al mig. Dins de cada part, l'ordre no importa.
+Tenim una llista `L` i un interval `[x, y]`, amb `x <= y`. Volem reordenar `L` de manera que els elements menors que `x` quedin a la part esquerra, els majors que `y` a la part dreta, i els de l'interval al mig. Dins de cada part, l'ordre no importa.
 
-Per a l'interval `[6, 9]` i la llista `[15, 7, 3, 0, 10, 6, 11, 9, 1, 13]`, un resultat possible és `[1, 3, 0, 7, 9, 6, 11, 10, 13, 15]`: els tres primers són menors que 6, els tres següents cauen dins de `[6, 9]` i els quatre últims són majors que 9.
+Per a l'interval `[6, 9]` i la llista `[15, 7, 3, 0, 10, 6, 11, 9, 1, 13]`, un resultat possible és `[1, 3, 0; 7, 9, 6; 11, 10, 13, 15]`: els tres primers són menors que 6, els tres següents cauen dins de `[6, 9]` i els quatre últims són majors que 9. Evidentment, hi ha altres resultats correctes possibles.
+
+Resoldre aquest problema amb una llista auxiliar és fàcil (penseu com fer-ho). Però ara ho farem sense per no haver de mantenir una còpia de tots els elements de la llista i, per tant, estalviar memòria.
 
 Per anar classificant sense fer servir una llista auxiliar, mantindrem quatre zones:
 
@@ -214,8 +218,8 @@ Els índexs `esq`, `mig` i `dre` marquen els límits de les zones:
 
 - `L[0:esq]` conté elements estrictament menors que `x`,
 - `L[esq:mig]` conté elements de l'interval `[x, y]`,
-- `L[mig:dre + 1]` conté elements encara per classificar,
-- `L[dre + 1:]` conté elements estrictament majors que `y`.
+- `L[dre + 1:]` conté elements estrictament majors que `y`,
+- `L[mig:dre + 1]` conté elements dels quals no s'afirma res.
 
 Això és l'invariant. La fletxa `dre` és al límit dret de la zona pendent: `dre` és l'índex de l'últim element per classificar, i tot el que queda a la seva dreta ja és més gran que `y`.
 
@@ -224,10 +228,14 @@ Al començament tota la llista està per classificar, així que `esq = mig = 0` 
 A cada volta mirem l'element `L[mig]`, el primer dels pendents:
 
 - Si és menor que `x`, l'intercanviem amb `L[esq]` i avancem `esq` i `mig`. L'element petit queda a la zona de l'esquerra. Si la zona del mig no era buida, l'element que hi havia a `esq` ja era de l'interval i, en avançar `mig`, continua dins d'aquesta zona. Si era buida, `esq` i `mig` coincideixen i l'intercanvi no mou res.
+
 - Si és major que `y`, l'intercanviem amb `L[dre]` i reculem `dre`. L'element gran passa a la zona de la dreta. L'element que arriba a la posició `mig` encara no l'hem mirat, i per això `mig` no avança.
+
 - Si cau dins de `[x, y]`, no es mou. Només avancem `mig`, i la zona del mig el va absorbint.
 
 Cada volta fa créixer `mig` o fa decréixer `dre`, de manera que la distància `dre - mig` baixa. El bucle acaba.
+
+El resultat és aquesta acció:
 
 ```python
 def classifica(L: list[int], x: int, y: int) -> None:
@@ -249,7 +257,9 @@ def classifica(L: list[int], x: int, y: int) -> None:
             mig = mig + 1
 ```
 
-Sobre l'exemple anterior, aquesta funció deixa exactament `[1, 3, 0, 7, 9, 6, 11, 10, 13, 15]`.
+Sobre l'exemple anterior, aquesta funció deixa exactament `[1, 3, 0; 7, 9, 6; 11, 10, 13, 15]`.
+
+Fixeu-vos que, per a tenir èxit, el nostre invariant ha hagut d'acomodar en certa manera una part desconeguda dels elements: la llista queda partida en quatre zones, no tres com el resultat exigeix.
 
 ## Com trobar un bon invariant
 
@@ -259,5 +269,11 @@ Els invariants són una manera efectiva d'obtenir algorismes iteratius correctes
 2. Descriviu l'estat del programa al començament d'una iteració qualsevol. Aquesta descripció és l'invariant.
 3. Declareu les variables que fan falta per escriure'l.
 4. Deduïu-ne la inicialització, la condició i el cos. L'ordre en què ho feu no és important: cadascun ha de complir l'obligació que li toca a l'esquema general, i cal comprovar que el bucle acaba.
+
+## Errors freqüents
+
+- No considerar l'invariant com a una propietat estàtica i atemporal del bucle, sinó com a una propietat dinàmica o temporal.
+- Treballar amb un invariant massa fort, cal afeblir el resultat desitjat per poder-hi anar convergint incrementalment a casa pas del bucle.
+- Treballar amb un invariant massa fluix, que no estableixi totes les relacions necessàries entre totes les variables del bucle.
 
 <Autors autors="jordic jpetit"/>
